@@ -8,7 +8,7 @@ public class ServiceTicket()
     
     public int CustomerId { get; set; }
 
-    public int EmployeeId { get; set; }
+    public int? EmployeeId { get; set; }
 
     public string Description { get; set; }
 
@@ -17,4 +17,6 @@ public class ServiceTicket()
     public DateTime DateCompleted { get; set; }
 
     public Employee Employee { get; set; }
+
+    public Customer Customer { get; set; }
 }

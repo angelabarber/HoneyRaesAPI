@@ -1,5 +1,6 @@
 using HoneyRaesAPI.Models;
 using HoneyRaesAPI.Models.DTOs;
+using Microsoft.AspNetCore.Authentication;
 
 List<Customer> customers = new List<Customer>
 {
@@ -125,10 +126,17 @@ app.MapGet("/servicetickets/{id}", (int id) =>
     }
   
     Employee employee = employees.FirstOrDefault(e => e.Id == serviceTicket.EmployeeId);
+    Customer customer = customers.FirstOrDefault(c => c.Id == serviceTicket.CustomerId);
     return Results.Ok( new ServiceTicketDTO
     {
         Id = serviceTicket.Id,
         CustomerId = serviceTicket.CustomerId,
+        Customer = customer  == null ? null : new CustomerDTO
+        {
+            Id = customer.Id,
+            Name = customer.Name,
+            Address = customer.Address
+        },
         EmployeeId = serviceTicket.EmployeeId,
         Employee = employee == null ? null : new EmployeeDTO
         {
@@ -160,12 +168,21 @@ app.MapGet("/customers/{id}", (int id) =>
     {
         return Results.NotFound();
     }
+    List<ServiceTicket> tickets = serviceTickets.Where(st => st.CustomerId == id).ToList();
   
     return Results.Ok(new CustomerDTO
     {
         Id = customer.Id,
         Name = customer.Name,
-        Address = customer.Address
+        Address = customer.Address,
+        ServiceTickets = tickets.Select(st => new ServiceTicketDTO
+        {
+            Id = st.Id,
+            EmployeeId = st.EmployeeId,
+            Description = st. Description,
+            Emergency = st.Emergency,
+            DateCompleted = st.DateCompleted
+        }).ToList()
     });
 });
 
