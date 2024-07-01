@@ -183,6 +183,42 @@ app.MapPost("/servicetickets", (ServiceTicket serviceTicket) =>
 
 });
 
+app.MapPut("/servicetickets/{id}", (int id, ServiceTicket serviceTicket) =>
+{
+    ServiceTicket ticketToUpdate = serviceTickets.FirstOrDefault(st => st.Id == id);
+
+    if (ticketToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    if (id != serviceTicket.Id)
+    {
+        return Results.BadRequest();
+    }
+
+    ticketToUpdate.CustomerId = serviceTicket.CustomerId;
+    ticketToUpdate.EmployeeId = serviceTicket.EmployeeId;
+    ticketToUpdate.Description = serviceTicket.Description;
+    ticketToUpdate.Emergency = serviceTicket.Emergency;
+    ticketToUpdate.DateCompleted = serviceTicket.DateCompleted;
+
+    return Results.NoContent();
+});
+
+app.MapDelete("/servicetickets/{id}", (int id) =>
+{
+    ServiceTicket serviceTicket = serviceTickets.FirstOrDefault(st => st.Id  == id);
+    if(serviceTicket == null)
+    {
+        return Results.NotFound();
+    }
+
+    serviceTickets.Remove(serviceTicket);
+
+    return Results.NoContent();
+});
+
+
 app.MapGet("/customers", () =>
 {
     return customers.Select(c => new CustomerDTO
