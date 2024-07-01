@@ -183,6 +183,14 @@ app.MapPost("/servicetickets", (ServiceTicket serviceTicket) =>
 
 });
 
+app.MapPost("/servicetickets/{id}/complete", (int id) =>
+{
+    ServiceTicket ticketToComplete = serviceTickets.FirstOrDefault(st => st.Id == id);
+
+    ticketToComplete.DateCompleted = DateTime.Today;
+
+});
+
 app.MapPut("/servicetickets/{id}", (int id, ServiceTicket serviceTicket) =>
 {
     ServiceTicket ticketToUpdate = serviceTickets.FirstOrDefault(st => st.Id == id);
