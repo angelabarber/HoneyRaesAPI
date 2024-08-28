@@ -300,7 +300,25 @@ app.MapGet("/employees/{id}", (int id) =>
     });
 });
 
+/// new endpoints for all of the extra coding challenge after tuber treats
+/// 
+app.MapGet("/servicetickets/incomplete-emergencies", () =>
+{
+    List<ServiceTicketDTO> incompleteEmergencyTickets = serviceTickets
+        .Where(st => st.DateCompleted == DateTime.MinValue && st.Emergency)
+        .Select(st => new ServiceTicketDTO
+        {
+            Id = st.Id,
+            CustomerId = st.CustomerId,
+            EmployeeId = st.EmployeeId,
+            Description = st.Description,
+            Emergency = st.Emergency,
+            DateCompleted = st.DateCompleted
+        })
+        .ToList();
 
+    return Results.Ok(incompleteEmergencyTickets);
+});
 
 app.Run();
 
