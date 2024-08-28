@@ -117,6 +117,8 @@ app.MapGet("/servicetickets", () =>
     });
 });
 
+
+
 app.MapGet("/servicetickets/{id}", (int id) =>
 {
     ServiceTicket serviceTicket = serviceTickets.FirstOrDefault(st => st.Id == id);
@@ -182,6 +184,8 @@ app.MapPost("/servicetickets", (ServiceTicket serviceTicket) =>
     });
 
 });
+
+
 
 app.MapPost("/servicetickets/{id}/complete", (int id) =>
 {
@@ -318,6 +322,26 @@ app.MapGet("/servicetickets/incomplete-emergencies", () =>
         .ToList();
 
     return Results.Ok(incompleteEmergencyTickets);
+});
+
+//unassigned tickets
+
+app.MapGet("/servicetickets/unassigned", () =>
+{
+    List<ServiceTicketDTO> unassignedTickets = serviceTickets
+        .Where(st => st.EmployeeId == null)
+        .Select(st => new ServiceTicketDTO
+        {
+            Id = st.Id,
+            CustomerId = st.CustomerId,
+            EmployeeId = st.EmployeeId,
+            Description = st.Description,
+            Emergency = st.Emergency,
+            DateCompleted = st.DateCompleted
+        })
+        .ToList();
+
+    return Results.Ok(unassignedTickets);
 });
 
 app.Run();
