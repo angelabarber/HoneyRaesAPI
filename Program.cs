@@ -306,6 +306,8 @@ app.MapGet("/employees/{id}", (int id) =>
 
 /// new endpoints for all of the extra coding challenge after tuber treats
 /// 
+/// incomplete emergency tickets
+/// 
 app.MapGet("/servicetickets/incomplete-emergencies", () =>
 {
     List<ServiceTicketDTO> incompleteEmergencyTickets = serviceTickets
@@ -342,6 +344,25 @@ app.MapGet("/servicetickets/unassigned", () =>
         .ToList();
 
     return Results.Ok(unassignedTickets);
+});
+
+//inactive customers
+
+app.MapGet("/customers/inactive", () =>
+{
+    DateTime oneYearAgo = DateTime.Now.AddYears(-1);
+
+    List<CustomerDTO> inactiveCustomers = customers
+        .Where(c => !serviceTickets.Any(st => st.CustomerId == c.Id && st.DateCompleted > oneYearAgo))
+        .Select(c => new CustomerDTO
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Address = c.Address
+        })
+        .ToList();
+
+    return Results.Ok(inactiveCustomers);
 });
 
 app.Run();
