@@ -365,5 +365,28 @@ app.MapGet("/customers/inactive", () =>
     return Results.Ok(inactiveCustomers);
 });
 
+//available employees-- employees not currently assigned to an incomplete service ticket
+
+app.MapGet("/employees/unassigned", () =>
+{
+    List<int> assignedEmployeeIds = serviceTickets
+        .Where(st => st.DateCompleted == DateTime.MinValue)
+        .Select(st => st.EmployeeId ?? -1)
+        .Where(id => id != -1)
+        .ToList();
+
+    List<EmployeeDTO> unassignedEmployees = employees
+        .Where(e => !assignedEmployeeIds.Contains(e.Id))
+        .Select(e => new EmployeeDTO
+        {
+            Id = e.Id,
+            Name = e.Name,
+            Specialty = e.Specialty
+        })
+        .ToList();
+
+    return Results.Ok(unassignedEmployees);
+});
+
 app.Run();
 
