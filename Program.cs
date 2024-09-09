@@ -388,5 +388,28 @@ app.MapGet("/employees/unassigned", () =>
     return Results.Ok(unassignedEmployees);
 });
 
+// return all of the customers for whom a given employee has been assigned to a service ticket
+
+app.MapGet("/customers/by-employee/{employeeId}", (int employeeId) =>
+{
+    Employee employee = employees.FirstOrDefault(e => e.Id == employeeId);
+    if (employee == null)
+    {
+        return Results.NotFound("Employee not found");
+    }
+
+    List<CustomerDTO> customersServedByEmployee = customers
+        .Where(c => serviceTickets.Any(st => st.EmployeeId == employeeId && st.CustomerId == c.Id))
+        .Select(c => new CustomerDTO
+        {
+            Id = c.Id,
+            Name = c.Name,
+            Address = c.Address
+        })
+        .ToList();
+
+    return Results.Ok(customersServedByEmployee);
+});
+
 app.Run();
 
