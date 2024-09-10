@@ -457,6 +457,28 @@ app.MapGet("/employees/most-productive-last-month", () =>
     return Results.Ok(mostProductiveEmployeeDTO);
 });
 
+//return completed tickets in order of the completion data, oldest first
+
+app.MapGet("/servicetickets/completed", () =>
+{
+    List<ServiceTicketDTO> completedTickets = serviceTickets
+        .Where(st => st.DateCompleted != DateTime.MinValue)
+        .OrderBy(st => st.DateCompleted)
+        .Select(st => new ServiceTicketDTO
+        {
+            Id = st.Id,
+            CustomerId = st.CustomerId,
+            EmployeeId = st.EmployeeId,
+            Description = st.Description,
+            Emergency = st.Emergency,
+            DateCompleted = st.DateCompleted
+        })
+        .ToList();
+
+    return Results.Ok(completedTickets);
+});
+
+
 
 app.Run();
 
