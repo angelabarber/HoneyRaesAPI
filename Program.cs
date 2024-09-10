@@ -478,7 +478,28 @@ app.MapGet("/servicetickets/completed", () =>
     return Results.Ok(completedTickets);
 });
 
+//Create an endpoint to return all tickets that are incomplete, in order first by whether they are emergencies, then by whether they are assigned or not (unassigned first).
 
+
+app.MapGet("/servicetickets/incomplete", () =>
+{
+    List<ServiceTicketDTO> incompleteTickets = serviceTickets
+        .Where(st => st.DateCompleted == DateTime.MinValue)
+        .OrderByDescending(st => st.Emergency)
+        .ThenBy(st => st.EmployeeId != null)
+        .Select(st => new ServiceTicketDTO
+        {
+            Id = st.Id,
+            CustomerId = st.CustomerId,
+            EmployeeId = st.EmployeeId,
+            Description = st.Description,
+            Emergency = st.Emergency,
+            DateCompleted = st.DateCompleted
+        })
+        .ToList();
+
+    return Results.Ok(incompleteTickets);
+});
 
 app.Run();
 
