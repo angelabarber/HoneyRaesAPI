@@ -411,5 +411,52 @@ app.MapGet("/customers/by-employee/{employeeId}", (int employeeId) =>
     return Results.Ok(customersServedByEmployee);
 });
 
+//employee with most service tickets in the month 
+
+app.MapGet("/employees/most-productive-last-month", () =>
+{
+    DateTime lastMonthStart = DateTime.Now.AddMonths(-1).Date.AddDays(1 - DateTime.Now.AddMonths(-1).Day);
+    DateTime lastMonthEnd = DateTime.Now.Date.AddDays(-DateTime.Now.Day);
+
+    List<Employee> employeesWithCompletedTickets = employees
+        .Where(e => serviceTickets.Any(st => 
+            st.EmployeeId == e.Id && 
+            st.DateCompleted >= lastMonthStart && 
+            st.DateCompleted <= lastMonthEnd))
+        .ToList();
+
+    if (employeesWithCompletedTickets.Count == 0)
+    {
+        return Results.NotFound("No employees completed tickets last month");
+    }
+
+    Employee mostProductiveEmployee = employeesWithCompletedTickets[0];
+    int maxCompletedTickets = 0;
+
+    foreach (Employee employee in employeesWithCompletedTickets)
+    {
+        int completedTickets = serviceTickets.Count(st => 
+            st.EmployeeId == employee.Id && 
+            st.DateCompleted >= lastMonthStart && 
+            st.DateCompleted <= lastMonthEnd);
+
+        if (completedTickets > maxCompletedTickets)
+        {
+            maxCompletedTickets = completedTickets;
+            mostProductiveEmployee = employee;
+        }
+    }
+
+    EmployeeDTO mostProductiveEmployeeDTO = new EmployeeDTO
+    {
+        Id = mostProductiveEmployee.Id,
+        Name = mostProductiveEmployee.Name,
+        Specialty = mostProductiveEmployee.Specialty
+    };
+
+    return Results.Ok(mostProductiveEmployeeDTO);
+});
+
+
 app.Run();
 
